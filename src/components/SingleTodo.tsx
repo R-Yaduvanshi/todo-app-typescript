@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Todo } from "../model";
 import { AiFillEdit, AiFillDelete } from "react-icons/ai";
 import { MdDone } from "react-icons/md";
@@ -9,6 +9,10 @@ interface Props {
   setTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
 }
 const SingleTodo: React.FC<Props> = ({ todo, todos, setTodos }: Props) => {
+  const [edit, setEdit] = useState<boolean>(false);
+  const [editTodo, setEditTodo] = useState<string>(todo.todo);
+
+  // done function
   const handleDone = (id: number) => {
     setTodos(
       todos.map((todo) =>
@@ -16,20 +20,34 @@ const SingleTodo: React.FC<Props> = ({ todo, todos, setTodos }: Props) => {
       )
     );
   };
+
+  // delete function
+  const handleDelete = (id: number) => {
+    setTodos(todos.filter((elem) => elem.id != id));
+  };
   return (
     <form className={styles.singleTodo}>
-      {todo.isDone ? (
+      {edit ? (
+        <input value={editTodo} onChange={(e) => setEditTodo(e.target.value)} />
+      ) : todo.isDone ? (
         <s className={styles.singleTodoText}>{todo.todo}</s>
       ) : (
         <span className={styles.singleTodoText}>{todo.todo}</span>
       )}
 
       <div>
-        <span className={styles.icon}>
+        <span
+          className={styles.icon}
+          onClick={() => {
+            if (!edit && !todo.isDone) {
+              setEdit(!edit);
+            }
+          }}
+        >
           <AiFillEdit />
         </span>
         <span className={styles.icon}>
-          <AiFillDelete />
+          <AiFillDelete onClick={() => handleDelete(todo.id)} />
         </span>
         <span className={styles.icon} onClick={() => handleDone(todo.id)}>
           <MdDone />
